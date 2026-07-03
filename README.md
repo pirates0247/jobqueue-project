@@ -106,7 +106,7 @@ npm run test:e2e       # full HTTP auth flow against a running Postgres/Redis
 
 ## Roadmap (built feature by feature, in order)
 
-1. ✅ Base architecture, Docker, Prisma, Redis, Authentication
+1. Base architecture, Docker, Prisma, Redis, Authentication
 2. Organizations & Projects (+ RBAC guard)
 3. Queues & Queue Configuration
 4. Jobs (immediate/delayed/scheduled/recurring/batch)
