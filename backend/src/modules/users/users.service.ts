@@ -1,0 +1,34 @@
+import { Injectable } from '@nestjs/common';
+import { User } from '@prisma/client';
+import { PrismaService } from '../../prisma/prisma.service';
+
+export interface CreateUserData {
+  email: string;
+  passwordHash: string;
+  firstName: string;
+  lastName: string;
+}
+
+@Injectable()
+export class UsersService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  findByEmail(email: string): Promise<User | null> {
+    return this.prisma.user.findUnique({ where: { email: email.toLowerCase() } });
+  }
+
+  findById(id: string): Promise<User | null> {
+    return this.prisma.user.findUnique({ where: { id } });
+  }
+
+  create(data: CreateUserData): Promise<User> {
+    return this.prisma.user.create({
+      data: {
+        email: data.email.toLowerCase(),
+        passwordHash: data.passwordHash,
+        firstName: data.firstName,
+        lastName: data.lastName,
+      },
+    });
+  }
+}

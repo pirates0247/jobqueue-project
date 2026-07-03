@@ -1,0 +1,852 @@
+{
+  "info": {
+    "name": "Pulse - Distributed Job Queue SaaS",
+    "description": "Complete API collection for the Pulse Distributed Job Queue SaaS platform. Base URL: http://localhost:4000/api/v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "pulse"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:4000/api/v1"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "org_slug",
+      "value": "my-org"
+    },
+    {
+      "key": "project_slug",
+      "value": "my-project"
+    },
+    {
+      "key": "queue_name",
+      "value": "my-queue"
+    },
+    {
+      "key": "job_id",
+      "value": ""
+    },
+    {
+      "key": "worker_id",
+      "value": ""
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('access_token', jsonData.data.accessToken);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('access_token', jsonData.data.accessToken);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@jobqueue.dev\",\n  \"password\": \"DemoPass1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "refresh"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Organizations",
+      "item": [
+        {
+          "name": "Create Organization",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('org_slug', jsonData.data.slug);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"My Organization\",\n  \"slug\": \"my-org\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/organizations",
+              "host": ["{{base_url}}"],
+              "path": ["organizations"]
+            }
+          }
+        },
+        {
+          "name": "List Organizations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations",
+              "host": ["{{base_url}}"],
+              "path": ["organizations"]
+            }
+          }
+        },
+        {
+          "name": "Get Organization by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Organization",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Organization Name\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Organization",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}"]
+            }
+          }
+        },
+        {
+          "name": "List Members",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/members",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "members"]
+            }
+          }
+        },
+        {
+          "name": "Invite Member",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"member@example.com\",\n  \"role\": \"DEVELOPER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/members",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "members"]
+            }
+          }
+        },
+        {
+          "name": "Update Member Role",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"ADMIN\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/members/:memberId",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "members", ":memberId"]
+            }
+          }
+        },
+        {
+          "name": "Remove Member",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/members/:memberId",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "members", ":memberId"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "Create Project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.data && jsonData.data.slug) { pm.collectionVariables.set('project_slug', jsonData.data.slug); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"My Project\",\n  \"slug\": \"my-project\",\n  \"description\": \"A sample project\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects"]
+            }
+          }
+        },
+        {
+          "name": "List Projects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects"]
+            }
+          }
+        },
+        {
+          "name": "Get Project by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects/{{project_slug}}",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects", "{{project_slug}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Project",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Project\",\n  \"description\": \"Updated description\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects/{{project_slug}}",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects", "{{project_slug}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Project",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects/{{project_slug}}",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects", "{{project_slug}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Queues",
+      "item": [
+        {
+          "name": "Create Queue",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.data && jsonData.data.name) { pm.collectionVariables.set('queue_name', jsonData.data.name); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"my-queue\",\n  \"priority\": 0,\n  \"concurrencyLimit\": 5,\n  \"retryStrategy\": \"EXPONENTIAL\",\n  \"maxRetries\": 3,\n  \"baseRetryDelayMs\": 1000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects/{{project_slug}}/queues",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects", "{{project_slug}}", "queues"]
+            }
+          }
+        },
+        {
+          "name": "List Queues",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects/{{project_slug}}/queues",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects", "{{project_slug}}", "queues"]
+            }
+          }
+        },
+        {
+          "name": "Get Queue by Name",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects/{{project_slug}}/queues/{{queue_name}}",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects", "{{project_slug}}", "queues", "{{queue_name}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Queue",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"priority\": 5,\n  \"concurrencyLimit\": 10,\n  \"retryStrategy\": \"LINEAR\",\n  \"maxRetries\": 5,\n  \"baseRetryDelayMs\": 2000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects/{{project_slug}}/queues/{{queue_name}}",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects", "{{project_slug}}", "queues", "{{queue_name}}"]
+            }
+          }
+        },
+        {
+          "name": "Pause Queue",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects/{{project_slug}}/queues/{{queue_name}}/pause",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects", "{{project_slug}}", "queues", "{{queue_name}}", "pause"]
+            }
+          }
+        },
+        {
+          "name": "Resume Queue",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects/{{project_slug}}/queues/{{queue_name}}/resume",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects", "{{project_slug}}", "queues", "{{queue_name}}", "resume"]
+            }
+          }
+        },
+        {
+          "name": "Get Queue Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects/{{project_slug}}/queues/{{queue_name}}/stats",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects", "{{project_slug}}", "queues", "{{queue_name}}", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Delete Queue",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects/{{project_slug}}/queues/{{queue_name}}",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects", "{{project_slug}}", "queues", "{{queue_name}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Jobs",
+      "item": [
+        {
+          "name": "Create Job",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.data && jsonData.data.id) { pm.collectionVariables.set('job_id', jsonData.data.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"IMMEDIATE\",\n  \"payload\": {\n    \"task\": \"send-email\",\n    \"to\": \"user@example.com\",\n    \"subject\": \"Hello\"\n  },\n  \"priority\": 0,\n  \"maxRetries\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects/{{project_slug}}/queues/{{queue_name}}/jobs",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects", "{{project_slug}}", "queues", "{{queue_name}}", "jobs"]
+            }
+          }
+        },
+        {
+          "name": "List Jobs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects/{{project_slug}}/queues/{{queue_name}}/jobs",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects", "{{project_slug}}", "queues", "{{queue_name}}", "jobs"]
+            }
+          }
+        },
+        {
+          "name": "Get Job by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects/{{project_slug}}/queues/{{queue_name}}/jobs/{{job_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects", "{{project_slug}}", "queues", "{{queue_name}}", "jobs", "{{job_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Retry Failed Job",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects/{{project_slug}}/queues/{{queue_name}}/jobs/{{job_id}}/retry",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects", "{{project_slug}}", "queues", "{{queue_name}}", "jobs", "{{job_id}}", "retry"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Job",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects/{{project_slug}}/queues/{{queue_name}}/jobs/{{job_id}}/cancel",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects", "{{project_slug}}", "queues", "{{queue_name}}", "jobs", "{{job_id}}", "cancel"]
+            }
+          }
+        },
+        {
+          "name": "Delete Job",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/organizations/{{org_slug}}/projects/{{project_slug}}/queues/{{queue_name}}/jobs/{{job_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["organizations", "{{org_slug}}", "projects", "{{project_slug}}", "queues", "{{queue_name}}", "jobs", "{{job_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Workers",
+      "item": [
+        {
+          "name": "Register Worker",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.data && jsonData.data.id) { pm.collectionVariables.set('worker_id', jsonData.data.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"worker-1\",\n  \"hostname\": \"server-01\",\n  \"concurrency\": 5,\n  \"metadata\": {\n    \"version\": \"1.0.0\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/workers/register",
+              "host": ["{{base_url}}"],
+              "path": ["workers", "register"]
+            }
+          }
+        },
+        {
+          "name": "Worker Heartbeat",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/workers/{{worker_id}}/heartbeat",
+              "host": ["{{base_url}}"],
+              "path": ["workers", "{{worker_id}}", "heartbeat"]
+            }
+          }
+        },
+        {
+          "name": "Claim Jobs",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"queueIds\": [\"queue-uuid-1\"],\n  \"limit\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/workers/{{worker_id}}/claim",
+              "host": ["{{base_url}}"],
+              "path": ["workers", "{{worker_id}}", "claim"]
+            }
+          }
+        },
+        {
+          "name": "Complete Job",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"result\": \"Task completed successfully\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/workers/{{worker_id}}/jobs/{{job_id}}/complete",
+              "host": ["{{base_url}}"],
+              "path": ["workers", "{{worker_id}}", "jobs", "{{job_id}}", "complete"]
+            }
+          }
+        },
+        {
+          "name": "Fail Job",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"error\": \"Connection timeout\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/workers/{{worker_id}}/jobs/{{job_id}}/fail",
+              "host": ["{{base_url}}"],
+              "path": ["workers", "{{worker_id}}", "jobs", "{{job_id}}", "fail"]
+            }
+          }
+        },
+        {
+          "name": "List Workers",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/workers",
+              "host": ["{{base_url}}"],
+              "path": ["workers"]
+            }
+          }
+        },
+        {
+          "name": "Get Worker by ID",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/workers/{{worker_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["workers", "{{worker_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Worker",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/workers/{{worker_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["workers", "{{worker_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/dashboard/metrics",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "metrics"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

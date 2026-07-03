@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Design direction: "control plane" — a dense, technical dashboard in the
+  spirit of Linear/Vercel/Datadog. Deep neutral surfaces let job/queue state
+  do the talking; the signature accent (violet, ~262°) marks anything "live"
+  — running jobs, active websocket connections, the primary CTA. Data-heavy
+  cells (job IDs, timestamps, cron expressions) use the mono face so numbers
+  align and scan like a terminal.
+*/
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 10%;
+
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 262 83% 58%;
+
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 10% 10%;
+
+    --accent: 262 83% 96%;
+    --accent-foreground: 262 83% 30%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 60% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 240 10% 10%;
+
+    --status-queued: 240 5% 55%;
+    --status-scheduled: 217 91% 60%;
+    --status-claimed: 38 92% 50%;
+    --status-running: 262 83% 58%;
+    --status-completed: 152 60% 36%;
+    --status-retrying: 32 95% 55%;
+    --status-failed: 0 72% 51%;
+    --status-dead: 0 0% 30%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 240 10% 6%;
+    --foreground: 240 10% 94%;
+
+    --card: 240 9% 9%;
+    --card-foreground: 240 10% 94%;
+
+    --border: 240 6% 16%;
+    --input: 240 6% 16%;
+    --ring: 262 83% 65%;
+
+    --muted: 240 6% 13%;
+    --muted-foreground: 240 5% 60%;
+
+    --primary: 262 83% 65%;
+    --primary-foreground: 240 10% 6%;
+
+    --secondary: 240 6% 13%;
+    --secondary-foreground: 240 10% 94%;
+
+    --accent: 262 50% 18%;
+    --accent-foreground: 262 83% 85%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 55% 45%;
+    --success-foreground: 240 10% 6%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 240 10% 6%;
+
+    --status-queued: 240 5% 55%;
+    --status-scheduled: 217 91% 65%;
+    --status-claimed: 38 92% 55%;
+    --status-running: 262 83% 65%;
+    --status-completed: 152 55% 45%;
+    --status-retrying: 32 95% 60%;
+    --status-failed: 0 72% 60%;
+    --status-dead: 240 5% 45%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  ::selection {
+    @apply bg-primary/20;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}

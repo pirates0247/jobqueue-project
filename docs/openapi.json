@@ -1,0 +1,776 @@
+﻿{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Pulse - Distributed Job Queue SaaS API",
+    "version": "1.0.0",
+    "description": "REST API for the Pulse distributed job queue and worker orchestration platform."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000/api/v1",
+      "description": "Local development"
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register a new user",
+        "operationId": "authRegister",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RegisterRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User registered" },
+          "409": { "description": "Email already exists" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login",
+        "operationId": "authLogin",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login successful" },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Refresh access token",
+        "operationId": "authRefresh",
+        "responses": {
+          "200": { "description": "Token refreshed" },
+          "401": { "description": "Invalid refresh token" }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Logout",
+        "operationId": "authLogout",
+        "responses": { "204": { "description": "Logged out" } }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Get current user",
+        "security": [{ "bearerAuth": [] }],
+        "operationId": "authMe",
+        "responses": { "200": { "description": "User info" } }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Health check",
+        "operationId": "healthCheck",
+        "responses": { "200": { "description": "Health status" } }
+      }
+    },
+    "/organizations": {
+      "post": {
+        "tags": ["Organizations"],
+        "summary": "Create organization",
+        "security": [{ "bearerAuth": [] }],
+        "operationId": "createOrganization",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateOrganizationRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Organization created" },
+          "409": { "description": "Slug already exists" }
+        }
+      },
+      "get": {
+        "tags": ["Organizations"],
+        "summary": "List organizations",
+        "security": [{ "bearerAuth": [] }],
+        "operationId": "listOrganizations",
+        "responses": { "200": { "description": "List of organizations" } }
+      }
+    },
+    "/organizations/{slug}": {
+      "get": {
+        "tags": ["Organizations"],
+        "summary": "Get organization",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "getOrganization",
+        "responses": {
+          "200": { "description": "Organization details" },
+          "404": { "description": "Not found" }
+        }
+      },
+      "put": {
+        "tags": ["Organizations"],
+        "summary": "Update organization",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "updateOrganization",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateOrganizationRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Organization updated" },
+          "403": { "description": "Forbidden" }
+        }
+      },
+      "delete": {
+        "tags": ["Organizations"],
+        "summary": "Delete organization",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "deleteOrganization",
+        "responses": { "204": { "description": "Deleted" } }
+      }
+    },
+    "/organizations/{slug}/members": {
+      "get": {
+        "tags": ["Organizations"],
+        "summary": "List members",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "listMembers",
+        "responses": { "200": { "description": "Member list" } }
+      },
+      "post": {
+        "tags": ["Organizations"],
+        "summary": "Invite member",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "inviteMember",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InviteMemberRequest" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Member invited" } }
+      }
+    },
+    "/organizations/{slug}/members/{memberId}": {
+      "put": {
+        "tags": ["Organizations"],
+        "summary": "Update member role",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "memberId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "updateMemberRole",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateMemberRoleRequest" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Role updated" } }
+      },
+      "delete": {
+        "tags": ["Organizations"],
+        "summary": "Remove member",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "memberId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "removeMember",
+        "responses": { "204": { "description": "Member removed" } }
+      }
+    },
+    "/organizations/{slug}/projects": {
+      "post": {
+        "tags": ["Projects"],
+        "summary": "Create project",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "createProject",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateProjectRequest" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Project created" } }
+      },
+      "get": {
+        "tags": ["Projects"],
+        "summary": "List projects",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } },
+          { "name": "search", "in": "query", "schema": { "type": "string" } }
+        ],
+        "operationId": "listProjects",
+        "responses": { "200": { "description": "Paginated projects" } }
+      }
+    },
+    "/organizations/{slug}/projects/{projectSlug}": {
+      "get": {
+        "tags": ["Projects"],
+        "summary": "Get project",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "projectSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "getProject",
+        "responses": { "200": { "description": "Project details" } }
+      },
+      "put": {
+        "tags": ["Projects"],
+        "summary": "Update project",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "projectSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "updateProject",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateProjectRequest" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Project updated" } }
+      },
+      "delete": {
+        "tags": ["Projects"],
+        "summary": "Delete project",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "projectSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "deleteProject",
+        "responses": { "204": { "description": "Deleted" } }
+      }
+    },
+    "/organizations/{slug}/projects/{projectSlug}/queues": {
+      "post": {
+        "tags": ["Queues"],
+        "summary": "Create queue",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "projectSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "createQueue",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateQueueRequest" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Queue created" } }
+      },
+      "get": {
+        "tags": ["Queues"],
+        "summary": "List queues",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "projectSlug", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "listQueues",
+        "responses": { "200": { "description": "Paginated queues" } }
+      }
+    },
+    "/organizations/{slug}/projects/{projectSlug}/queues/{name}": {
+      "get": {
+        "tags": ["Queues"],
+        "summary": "Get queue",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "projectSlug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "name", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "getQueue",
+        "responses": { "200": { "description": "Queue details" } }
+      },
+      "put": {
+        "tags": ["Queues"],
+        "summary": "Update queue",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "projectSlug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "name", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "updateQueue",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateQueueRequest" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Queue updated" } }
+      },
+      "delete": {
+        "tags": ["Queues"],
+        "summary": "Delete queue",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "projectSlug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "name", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "deleteQueue",
+        "responses": { "204": { "description": "Deleted" } }
+      }
+    },
+    "/organizations/{slug}/projects/{projectSlug}/queues/{name}/pause": {
+      "post": {
+        "tags": ["Queues"],
+        "summary": "Pause queue",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "projectSlug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "name", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "pauseQueue",
+        "responses": { "200": { "description": "Queue paused" } }
+      }
+    },
+    "/organizations/{slug}/projects/{projectSlug}/queues/{name}/resume": {
+      "post": {
+        "tags": ["Queues"],
+        "summary": "Resume queue",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "projectSlug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "name", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "resumeQueue",
+        "responses": { "200": { "description": "Queue resumed" } }
+      }
+    },
+    "/organizations/{slug}/projects/{projectSlug}/queues/{name}/stats": {
+      "get": {
+        "tags": ["Queues"],
+        "summary": "Queue stats",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "projectSlug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "name", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "getQueueStats",
+        "responses": { "200": { "description": "Queue statistics" } }
+      }
+    },
+    "/organizations/{slug}/projects/{projectSlug}/queues/{name}/jobs": {
+      "post": {
+        "tags": ["Jobs"],
+        "summary": "Create job",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "projectSlug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "name", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "createJob",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateJobRequest" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Job created" } }
+      },
+      "get": {
+        "tags": ["Jobs"],
+        "summary": "List jobs",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "projectSlug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "name", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } },
+          { "name": "status", "in": "query", "schema": { "type": "string" } },
+          { "name": "type", "in": "query", "schema": { "type": "string" } }
+        ],
+        "operationId": "listJobs",
+        "responses": { "200": { "description": "Paginated jobs" } }
+      }
+    },
+    "/organizations/{slug}/projects/{projectSlug}/queues/{name}/jobs/{jobId}": {
+      "get": {
+        "tags": ["Jobs"],
+        "summary": "Get job",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "projectSlug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "name", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "jobId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "getJob",
+        "responses": { "200": { "description": "Job details with logs" } }
+      },
+      "delete": {
+        "tags": ["Jobs"],
+        "summary": "Delete job",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "projectSlug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "name", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "jobId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "deleteJob",
+        "responses": { "204": { "description": "Deleted" } }
+      }
+    },
+    "/organizations/{slug}/projects/{projectSlug}/queues/{name}/jobs/{jobId}/retry": {
+      "post": {
+        "tags": ["Jobs"],
+        "summary": "Retry failed job",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "projectSlug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "name", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "jobId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "retryJob",
+        "responses": { "200": { "description": "Job queued for retry" } }
+      }
+    },
+    "/organizations/{slug}/projects/{projectSlug}/queues/{name}/jobs/{jobId}/cancel": {
+      "post": {
+        "tags": ["Jobs"],
+        "summary": "Cancel job",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "slug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "projectSlug", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "name", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "jobId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "cancelJob",
+        "responses": { "200": { "description": "Job cancelled" } }
+      }
+    },
+    "/workers/register": {
+      "post": {
+        "tags": ["Workers"],
+        "summary": "Register worker",
+        "operationId": "registerWorker",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RegisterWorkerRequest" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Worker registered" } }
+      }
+    },
+    "/workers/{id}/heartbeat": {
+      "post": {
+        "tags": ["Workers"],
+        "summary": "Worker heartbeat",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "workerHeartbeat",
+        "responses": { "200": { "description": "Heartbeat recorded" } }
+      }
+    },
+    "/workers/{id}/claim": {
+      "post": {
+        "tags": ["Workers"],
+        "summary": "Claim jobs",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "claimJobs",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ClaimJobsRequest" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Jobs claimed" } }
+      }
+    },
+    "/workers/{id}/jobs/{jobId}/complete": {
+      "post": {
+        "tags": ["Workers"],
+        "summary": "Complete job",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "jobId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "completeJob",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CompleteJobRequest" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Job completed" } }
+      }
+    },
+    "/workers/{id}/jobs/{jobId}/fail": {
+      "post": {
+        "tags": ["Workers"],
+        "summary": "Fail job",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "jobId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "failJob",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/FailJobRequest" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Job failed" } }
+      }
+    },
+    "/workers": {
+      "get": {
+        "tags": ["Workers"],
+        "summary": "List workers",
+        "operationId": "listWorkers",
+        "responses": { "200": { "description": "Worker list" } }
+      }
+    },
+    "/workers/{id}": {
+      "get": {
+        "tags": ["Workers"],
+        "summary": "Get worker",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "getWorker",
+        "responses": { "200": { "description": "Worker details" } }
+      },
+      "delete": {
+        "tags": ["Workers"],
+        "summary": "Delete worker",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "operationId": "deleteWorker",
+        "responses": { "204": { "description": "Deleted" } }
+      }
+    },
+    "/dashboard/metrics": {
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "Dashboard metrics",
+        "security": [{ "bearerAuth": [] }],
+        "operationId": "getDashboardMetrics",
+        "responses": { "200": { "description": "Dashboard metrics" } }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "RegisterRequest": {
+        "type": "object",
+        "required": ["email", "password", "firstName", "lastName"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 8 },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string" }
+        }
+      },
+      "CreateOrganizationRequest": {
+        "type": "object",
+        "required": ["name", "slug"],
+        "properties": {
+          "name": { "type": "string" },
+          "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" }
+        }
+      },
+      "UpdateOrganizationRequest": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" }
+        }
+      },
+      "InviteMemberRequest": {
+        "type": "object",
+        "required": ["email", "role"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "role": { "type": "string", "enum": ["OWNER", "ADMIN", "DEVELOPER", "VIEWER"] }
+        }
+      },
+      "UpdateMemberRoleRequest": {
+        "type": "object",
+        "required": ["role"],
+        "properties": {
+          "role": { "type": "string", "enum": ["OWNER", "ADMIN", "DEVELOPER", "VIEWER"] }
+        }
+      },
+      "CreateProjectRequest": {
+        "type": "object",
+        "required": ["name", "slug"],
+        "properties": {
+          "name": { "type": "string" },
+          "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "description": { "type": "string" }
+        }
+      },
+      "UpdateProjectRequest": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      },
+      "CreateQueueRequest": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "priority": { "type": "integer", "minimum": 0, "maximum": 10 },
+          "concurrencyLimit": { "type": "integer", "minimum": 1, "maximum": 100 },
+          "retryStrategy": { "type": "string", "enum": ["FIXED", "LINEAR", "EXPONENTIAL"] },
+          "maxRetries": { "type": "integer", "minimum": 0, "maximum": 100 },
+          "baseRetryDelayMs": { "type": "integer", "minimum": 0, "maximum": 3600000 }
+        }
+      },
+      "UpdateQueueRequest": {
+        "type": "object",
+        "properties": {
+          "priority": { "type": "integer" },
+          "concurrencyLimit": { "type": "integer" },
+          "retryStrategy": { "type": "string" },
+          "maxRetries": { "type": "integer" },
+          "baseRetryDelayMs": { "type": "integer" }
+        }
+      },
+      "CreateJobRequest": {
+        "type": "object",
+        "required": ["payload"],
+        "properties": {
+          "type": { "type": "string", "enum": ["IMMEDIATE", "DELAYED", "SCHEDULED", "RECURRING", "BATCH"] },
+          "payload": { "type": "object" },
+          "priority": { "type": "integer" },
+          "maxRetries": { "type": "integer" },
+          "cronExpression": { "type": "string" },
+          "runAt": { "type": "string", "format": "date-time" },
+          "idempotencyKey": { "type": "string" },
+          "batchId": { "type": "string" },
+          "parentJobId": { "type": "string" }
+        }
+      },
+      "RegisterWorkerRequest": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "hostname": { "type": "string" },
+          "concurrency": { "type": "integer", "minimum": 1, "maximum": 50 },
+          "metadata": { "type": "object" }
+        }
+      },
+      "ClaimJobsRequest": {
+        "type": "object",
+        "required": ["queueIds"],
+        "properties": {
+          "queueIds": { "type": "array", "items": { "type": "string" } },
+          "limit": { "type": "integer", "minimum": 1 }
+        }
+      },
+      "CompleteJobRequest": {
+        "type": "object",
+        "properties": {
+          "result": { "type": "string" }
+        }
+      },
+      "FailJobRequest": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string" }
+        }
+      }
+    }
+  }
+}
